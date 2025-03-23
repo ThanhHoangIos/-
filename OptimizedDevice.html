@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OptimizedDevice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Hiệu ứng tuyết */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Hộp giao diện */
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            margin: 100px auto;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+
+        .status {
+            font-size: 20px;
+            color: cyan;
+        }
+
+        .online {
+            color: #0ff;
+            font-weight: bold;
+        }
+
+        .time {
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        .options {
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .options label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Nút bật/tắt chuyển sang bên phải */
+        .options label input {
+            margin-left: auto;
+        }
+
+        /* Nút bật/tắt */
+        input[type="checkbox"] {
+            appearance: none;
+            width: 40px;
+            height: 20px;
+            background: red;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        input[type="checkbox"]::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 1px;
+            left: 2px;
+            transition: 0.3s;
+        }
+
+        input[type="checkbox"]:checked {
+            background: limegreen;
+        }
+
+        input[type="checkbox"]:checked::before {
+            left: 20px;
+        }
+
+        .footer {
+            margin-top: 10px;
+            font-size: 16px;
+            color: cyan;
+        }
+
+        .zzz {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="snowCanvas"></canvas>
+
+    <div class="container">
+        <h2 class="status">Trạng thái: <span class="online">Online</span></h2>
+        <p class="time">Thời gian: <span id="time"></span></p>
+
+        <div class="options">
+            <label>Aimlock <input type="checkbox"></label>
+            <label>Nhẹ Tâm V1 <input type="checkbox"></label>
+            <label>Optimize Config <input type="checkbox"></label>
+            <label>Ghim Tâm <input type="checkbox"></label>
+            <label>Buff DPI <input type="checkbox"></label>
+            <label>120Hz <input type="checkbox"></label>
+        </div>
+
+        <p class="footer">ThanhHoang <span class="zzz">🐸</span></p>
+    </div>
+
+    <script>
+        // Hiển thị thời gian hiện tại
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString("vi-VN");
+            document.getElementById("time").textContent = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Hiệu ứng tuyết rơi
+        const canvas = document.getElementById("snowCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let snowflakes = [];
+        for (let i = 0; i < 100; i++) {
+            snowflakes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 4 + 1,
+                speedX: Math.random() * 3 - 1.5,
+                speedY: Math.random() * 2 + 1,
+            });
+        }
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            for (let i = 0; i < snowflakes.length; i++) {
+                let flake = snowflakes[i];
+                ctx.moveTo(flake.x, flake.y);
+                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+            }
+            ctx.fill();
+            moveSnow();
+        }
+
+        function moveSnow() {
+            for (let i = 0; i < snowflakes.length; i++) {
+                let flake = snowflakes[i];
+                flake.x += flake.speedX;
+                flake.y += flake.speedY;
+                if (flake.y > canvas.height) {
+                    flake.y = 0;
+                    flake.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        function updateSnow() {
+            drawSnow();
+            requestAnimationFrame(updateSnow);
+        }
+        updateSnow();
+
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Thêm thông báo khi bật/tắt công tắc
+        document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+            checkbox.addEventListener('change', function() {
+                let optionName = this.parentElement.textContent.trim();
+                if (this.checked) {
+                    alert(`Bạn đã bật: ${optionName}`);
+                } else {
+                    alert(`Bạn đã tắt: ${optionName}`);
+                }
+            });
+        });
+    </script>
+
+<p><a href="NgTienMakeHbao.mobileconfig" download>Nhấn vào đây để tải cấu hình</a></p>
+
+<script>
+    // window.location.href = "NgTienMakeHbao.mobileconfig"; // Bỏ comment nếu muốn tự động mở file
+</script>
+</body>
+</html>
